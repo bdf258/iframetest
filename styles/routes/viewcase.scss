@@ -1,0 +1,44 @@
+body.viewcase {
+  .material-icons {
+    padding-top: 5px;
+    color: #7a7a7a;
+    &.f60 {
+      font-size: 52px;
+      float: left;
+      margin-right: 10px;
+      max-width: 52px;
+    }
+    &.red {
+      background: transparent;
+      color: red;
+    }
+    &.orange {
+      background: transparent;
+      color: orange;
+    }
+    &.green {
+      background: transparent;
+      color: green;
+    }
+  }
+
+  .d-flex,
+  .to,
+  .cc,
+  .bcc{
+    display: flex;
+    input{
+      flex: 1;
+      width: unset;
+    }
+  }
+
+  .inactive{
+    display: none;
+  }
+
+  .btn.editReviewDates + .close{
+    float: right;
+    margin-right: 10px;
+  }
+}

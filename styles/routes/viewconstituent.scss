@@ -1,0 +1,65 @@
+body.viewconstituent {
+//  #editMembership {
+//    label {
+//      width: 125px !important;
+//
+//      & + input,
+//      & + select {
+//        width: 385px;
+//      }
+//
+//      & ~ span {
+//        width: 395px !important;
+//      }
+//    }
+//  }
+
+  select.updateCustomSelectField + span.select2{
+    flex-grow: 1;
+    margin-right: 2%;
+    width: unset;
+  }
+  select.updateCustomSelectField.createMembershipField + span.select2{
+    margin-right: 0;
+  }
+
+  #mergeConstituent{
+    width: 700px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 150px;
+  }
+
+  .editMembershipFormContainer,
+  .createMembershipFormContainer {
+    .inputContainerMembership {
+      display: flex;
+      & > span {
+        width: unset !important;
+        flex-grow: 1;
+      }
+    }
+
+    .inputLabelMembership {
+      width: 130px;
+    }
+
+    .textareaInputsMembership {
+      margin-top: 0;
+      height: 150px;
+    }
+
+    .inputMembership {
+      flex-grow: 1;
+    }
+
+    .pseudoInputMembership {
+      min-height: 20px;
+      margin-bottom: 5px;
+      font-size: 80%;
+    }
+
+  }
+
+}
