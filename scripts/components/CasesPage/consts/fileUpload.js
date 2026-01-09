@@ -1,0 +1,28 @@
+export const allowedFileExtensions = [
+  "gif",
+  "jpg",
+  "jpeg",
+  "tiff",
+  "png",
+  "pdf",
+  "msg",
+  "eml",
+  "rtf",
+  "xps",
+  "doc",
+  "docx",
+  "ppt",
+  "pptx",
+  "xls",
+  "xlsx",
+  "txt",
+  "mp3",
+  "mp4",
+  "wav",
+  "od",
+  "mov",
+  "csv",
+  "zip",
+];
+
+export const maxFileSize = 26214400;
