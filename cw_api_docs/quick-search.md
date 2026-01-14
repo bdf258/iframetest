@@ -107,5 +107,4 @@ Returns all cases where the summary contains "housing" (case-insensitive).
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:220-242`
 - **Frontend API:** `scripts/api/src/cases.js:60-69`

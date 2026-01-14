@@ -89,5 +89,4 @@ Returns the full case object:
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:81-94`
 - **Frontend API:** `scripts/api/src/case.js:65-76`

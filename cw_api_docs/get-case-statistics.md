@@ -87,5 +87,4 @@ GET /api/ajax/cases/statistics/casetype/1
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:279-302`
 - **Frontend API:** `scripts/api/src/case.js:100-108`

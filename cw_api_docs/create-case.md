@@ -128,5 +128,4 @@ Returns the created case object with auto-generated fields:
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:133-197`
 - **Frontend API:** `scripts/api/src/case.js:39-63`

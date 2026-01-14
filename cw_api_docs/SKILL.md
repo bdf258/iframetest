@@ -4,27 +4,13 @@ This skill provides best practices for analyzing API routes, identifying paramet
 
 ## Overview
 
+The **frontend API client code** (`scripts/api/src/`) is the source of truth for API documentation. The `server/` directory contains only a mock server for local development and should not be used as a reference for API specifications.
+
 When documenting a new API endpoint, follow these steps to ensure comprehensive and accurate documentation.
 
 ---
 
-## Step 1: Locate the Route Definition
-
-### Backend Routes (Flask/Python)
-
-Search for route definitions in `server/routes/`:
-
-```python
-# Pattern to look for:
-@blueprint.route('/endpoint', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-def handler_function():
-    ...
-```
-
-**Key files:**
-- `server/routes/cases.py` - Case CRUD and search operations
-- `server/routes/auth.py` - Authentication endpoints
-- `server/routes/caseworkers.py` - Caseworker endpoints
+## Step 1: Locate the API Function
 
 ### Frontend API Client (JavaScript)
 
@@ -37,123 +23,107 @@ const functionName = async (param1, param2, modalActions, iln) =>
 ```
 
 **Key files:**
-- `scripts/api/src/case.js` - Single case operations
+- `scripts/api/src/case.js` - Single case operations (CRUD, merge, statistics)
 - `scripts/api/src/cases.js` - Case search/listing
 - `scripts/api/src/search.js` - Universal search
+- `scripts/api/src/auth.js` - Authentication
+
+### API Index Files
+
+Check for available endpoints:
+- `scripts/api/protected.index.js` - All protected (authenticated) API functions
+- `scripts/api/public.index.js` - Public API functions
 
 ---
 
-## Step 2: Identify Parameters
+## Step 2: Identify Parameters from JSDoc
+
+### Read JSDoc Comments
+
+The primary source for parameter information is JSDoc comments above each function:
+
+```javascript
+/**
+ * Create a new case.
+ * @param {Object} payload - The payload passed to the backend.
+ * @param {String} payload.reviewDate - (optional) The date string of when the case is up for review.
+ * @param {String} payload.contactTypeID - The ID of the contact type of the case.
+ * @param {String} payload.constituentID - The ID of the constituent this case belongs to.
+ * @param {String} payload.caseTypeID - The ID of the case type of the case.
+ * @param {String} payload.statusID - The ID of the status of the case.
+ * @param {String} payload.categoryTypeID - The ID of the category of the case.
+ * @param {String} payload.assignedToID - The ID of the user assigned to the case.
+ * @param {String} payload.summary - The text of the summary of the case.
+ * @param {function} modalActions - a func that sets the global modal content.
+ * @returns {Promise} A promise that resolves to the response from the API.
+ * @throws {String} An error message returned by the API.
+ */
+const createCase = async (payload, modalActions, iln) =>
+  await post("/cases", payload).catch(...)
+```
+
+### Extract Parameter Information
+
+From JSDoc, identify:
+- **Parameter name** - e.g., `payload.contactTypeID`
+- **Type** - e.g., `String`, `Number`, `Array<Number>`, `Object`
+- **Required vs Optional** - Look for "(optional)" in description
+- **Description** - What the parameter represents
 
 ### URL Parameters
 
-Look for dynamic segments in the route path:
+Look for template literals in the endpoint path:
 
-```python
-@cases_bp.route('/cases/<int:case_id>', methods=['GET'])
-#                        ^^^^^^^^^^^^
-#                        URL parameter: case_id (integer)
-```
-
-### Request Body Parameters
-
-Examine:
-
-1. **Docstrings** - Often contain expected payload structure:
-   ```python
-   """
-   Expected payload:
-   {
-       "field1": value,
-       "field2": value
-   }
-   """
-   ```
-
-2. **`request.get_json()`** - Shows that JSON body is expected
-
-3. **Field access patterns**:
-   ```python
-   data.get('fieldName', default_value)  # Optional with default
-   data['fieldName']                      # Required field
-   ```
-
-4. **Frontend JSDoc comments**:
-   ```javascript
-   /**
-    * @param {Object} payload
-    * @param {String} payload.fieldName - Description
-    */
-   ```
-
-### Query Parameters
-
-Look for `request.args.get()` patterns:
-
-```python
-page = request.args.get('page', 1, type=int)
+```javascript
+await get(`/cases/${caseID}`)     // caseID is a URL parameter
+await post(`/cases/${id}/merge`)  // id is a URL parameter
 ```
 
 ---
 
-## Step 3: Trace Data Flow
+## Step 3: Analyze the HTTP Method
 
-### Find the Data Handler
+### Identify the Fetch Utility Used
 
-Routes often call functions from the `data` module:
-
-```python
-from data import get_case_by_id, update_case, search_cases
+```javascript
+import { deleteReq, get, patch, post } from "./util/fetch";
 ```
 
-Check `server/data/mock_data.py` for:
-- Actual parameter processing logic
-- Valid values for enum-like fields
-- Filter/sort implementations
+| Utility | HTTP Method | Typical Use |
+|---------|-------------|-------------|
+| `get()` | GET | Retrieve data |
+| `post()` | POST | Create or search |
+| `patch()` | PATCH | Partial update |
+| `deleteReq()` | DELETE | Remove data |
 
-### Example: Tracing `search_cases`
+### Check `scripts/api/src/util/fetch.js`
 
-```python
-# In routes/cases.py:
-result = search_cases(filters)
-
-# In data/mock_data.py:
-def search_cases(filters):
-    # Filter by status
-    if filters.get("statusID") and len(filters["statusID"]) > 0:
-        results = [c for c in results if c["status"] in filters["statusID"]]
-```
-
-This reveals:
-- `statusID` is an optional array parameter
-- It filters cases by status field
-- Empty array means no filtering
+This file contains the base HTTP utilities and shows:
+- Base URL construction
+- Token handling
+- Request/response processing
 
 ---
 
-## Step 4: Identify Valid Values
+## Step 4: Cross-Reference with Component Usage
 
-### Reference Data Constants
+### Find Where API Functions Are Called
 
-Check `server/data/mock_data.py` for ID mappings:
+Search for usage in components to understand:
+- What payload shapes are actually used
+- How responses are processed
+- Error handling expectations
 
-```python
-STATUSES = {
-    1: "Open",
-    2: "In Progress",
-    ...
-}
-
-CASE_TYPES = {
-    1: "Housing",
-    2: "Benefits",
-    ...
-}
+```bash
+grep -r "createCase\|caseAPI.createCase" scripts/
 ```
 
-### Document All Valid Options
+### Check Route Initialization Files
 
-Create reference tables for each enum-like parameter.
+Look in `scripts/routes/` for page initialization that uses these APIs:
+- `scripts/routes/viewcase.js`
+- `scripts/routes/casespage.js`
+- `scripts/routes/createcase.js`
 
 ---
 
@@ -185,7 +155,7 @@ Use lowercase kebab-case matching the operation:
 [Table of body parameters with type, required, description]
 
 ## Parameter Values
-[Reference tables for enum-like parameters]
+[Reference tables for enum-like parameters - note these need backend verification]
 
 ## Example Request
 [JSON example]
@@ -200,7 +170,15 @@ Use lowercase kebab-case matching the operation:
 [Table of possible error status codes]
 
 ## Source Files
-[Links to backend and frontend source files with line numbers]
+[Link to frontend source file with line numbers]
+```
+
+### Note About Parameter Values
+
+For ID-based parameters (statusID, caseTypeID, etc.), include a note that values should be verified against the actual backend:
+
+```markdown
+> **Note:** These ID mappings are placeholders. Verify against the actual backend API.
 ```
 
 ---
@@ -217,16 +195,17 @@ Add an entry to `GUIDE.md`:
 
 ## Checklist for Complete Documentation
 
-- [ ] Route path and HTTP method identified
-- [ ] All URL parameters documented
-- [ ] All request body parameters documented
+- [ ] API function located in `scripts/api/src/`
+- [ ] HTTP method identified (get/post/patch/deleteReq)
+- [ ] URL parameters documented from template literals
+- [ ] Request body parameters extracted from JSDoc
 - [ ] Optional vs required parameters marked
-- [ ] Default values noted
-- [ ] Valid values for enum parameters listed
+- [ ] Default values noted where specified
+- [ ] Placeholder values for enums noted as needing verification
 - [ ] Example request provided
-- [ ] Response format documented
-- [ ] Error responses listed
-- [ ] Source file locations included
+- [ ] Response format documented (if observable from code)
+- [ ] Error handling documented
+- [ ] Frontend source file location included
 - [ ] GUIDE.md updated with new entry
 
 ---
@@ -235,40 +214,39 @@ Add an entry to `GUIDE.md`:
 
 ### Task: Document a new endpoint
 
-1. **Find the route:**
+1. **Find the API function:**
    ```bash
-   grep -n "route.*new_endpoint" server/routes/*.py
+   grep -rn "functionName" scripts/api/src/
    ```
 
-2. **Read the handler:**
-   ```python
-   @bp.route('/new-endpoint', methods=['POST'])
-   def new_endpoint():
-       data = request.get_json()
-       field1 = data.get('field1')  # Optional
-       field2 = data['field2']       # Required
-   ```
-
-3. **Check frontend API:**
+2. **Read the JSDoc and function:**
    ```javascript
-   const newEndpoint = async (payload) =>
-     await post("/new-endpoint", payload)
+   /**
+    * @param {Object} payload
+    * @param {Number} payload.fieldA - Required field
+    * @param {String} [payload.fieldB] - Optional field
+    */
+   const functionName = async (payload, modalActions, iln) =>
+     await post("/endpoint", payload).catch(...)
    ```
 
-4. **Review JSDoc for parameter hints**
+3. **Identify the endpoint path and method** from the function body
 
-5. **Trace data handler for processing logic**
+4. **Check for URL parameters** in template literals
 
-6. **Create documentation file following template**
+5. **Search for usage examples** in components/routes
 
-7. **Update GUIDE.md**
+6. **Create documentation file** following template
+
+7. **Update GUIDE.md** with new entry
 
 ---
 
 ## Tips
 
-- **Always read the actual code** - Docstrings may be outdated
-- **Check both backend and frontend** - They may have different perspectives
-- **Look for validation logic** - Reveals required fields and constraints
-- **Test with mock data** - Verify your understanding of valid values
+- **JSDoc is the primary source** - The frontend code documents what parameters are expected
+- **Watch for optional markers** - "(optional)" in descriptions or `[param]` syntax
+- **Type annotations matter** - `Array<Number>` vs `Number` changes how parameters work
+- **Check nested objects** - `payload.dateRange.from` indicates nested structure
 - **Include line numbers** - Makes future updates easier
+- **Note verification needs** - ID values need backend confirmation

@@ -135,5 +135,4 @@ Returns the updated case object with `lastActioned` timestamp automatically upda
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:97-130`
 - **Frontend API:** `scripts/api/src/case.js:1-26`

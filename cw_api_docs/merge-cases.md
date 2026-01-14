@@ -71,5 +71,4 @@ This merges case 123 into case 456. After the merge:
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:245-276`
 - **Frontend API:** `scripts/api/src/case.js:78-98`

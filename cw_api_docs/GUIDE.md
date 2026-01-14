@@ -25,6 +25,8 @@ Authorization: Bearer <token>
 
 ## Quick Reference: Common IDs
 
+> **Note:** These ID mappings are placeholders derived from mock data. Verify against the actual backend API for production values.
+
 ### Status IDs
 | ID | Status |
 |----|--------|
@@ -102,6 +104,6 @@ When documenting a new endpoint, use the [SKILL.md](./SKILL.md) guide for best p
 
 ## Source Code Locations
 
-- **Backend Routes:** `server/routes/cases.py`
-- **Backend Data Logic:** `server/data/mock_data.py`
 - **Frontend API Client:** `scripts/api/src/case.js`, `scripts/api/src/cases.js`
+
+> **Note:** The `server/` directory contains a mock server for local development/testing only. The frontend API client code is the source of truth for API parameter documentation.

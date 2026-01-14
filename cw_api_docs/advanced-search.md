@@ -204,6 +204,4 @@ Same structure as `tagged`, used to exclude cases with specific tags.
 
 ## Source Files
 
-- **Backend:** `server/routes/cases.py:26-78`
-- **Backend Logic:** `server/data/mock_data.py:237-316`
 - **Frontend API:** `scripts/api/src/cases.js:1-34`
