@@ -49,6 +49,36 @@ GET /api/ajax/caseworkers
 | `initials` | String | Caseworker's initials |
 | `email` | String | Caseworker's email address |
 
+### Legacy Endpoint
+
+**Endpoint:** `GET /aj_getcaseworkers.php`
+
+This legacy PHP endpoint returns caseworkers with a slightly different response format:
+
+```json
+[
+  {
+    "ID": "1",
+    "caseworkerName": "System",
+    "email": "",
+    "active": true
+  },
+  {
+    "ID": "2",
+    "caseworkerName": "Alex Ballinger MP",
+    "email": "alex.ballinger.mp@parliament.uk",
+    "active": true
+  }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | String | Caseworker's unique identifier (as string) |
+| `caseworkerName` | String | Caseworker's full name |
+| `email` | String | Caseworker's email address |
+| `active` | Boolean | Whether the caseworker is currently active |
+
 ### Error Responses
 
 | Status | Description |
