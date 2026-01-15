@@ -46,6 +46,7 @@ This folder contains detailed documentation for all API endpoints in the Casewor
 | `/api/ajax/caseworkers` | GET | [caseworkers.md](./caseworkers.md) | Get all active caseworkers |
 | `/api/ajax/caseworkers/all` | GET | [caseworkers.md](./caseworkers.md) | Get all caseworkers (including inactive) |
 | `/api/ajax/caseworkers/forCase/<id>` | GET | [caseworkers.md](./caseworkers.md) | Get caseworkers available for a case |
+| `/aj_getcaseworkers.php` | GET | [caseworkers.md](./caseworkers.md) | Legacy: Get all caseworkers |
 
 ## Constituents Endpoints
 
@@ -153,6 +154,11 @@ This folder contains detailed documentation for all API endpoints in the Casewor
 | `/api/ajax/inbox/bulkActions/assignCaseworker` | POST | [inbox.md](./inbox.md) | Bulk assign to caseworker |
 | `/api/ajax/inbox/constituentMatches` | POST | [inbox.md](./inbox.md) | Find constituent matches |
 | `/api/ajax/inbox/triggerAutomation` | POST | [inbox.md](./inbox.md) | Trigger email automation |
+| `/aj_filterEmailCaseWorker.php` | POST | [inbox.md](./inbox.md) | Legacy: Filter emails by caseworker |
+| `/aj_getNoEmails.php` | POST | [inbox.md](./inbox.md) | Legacy: Get email count |
+| `/aj_fetchemail.php` | POST | [inbox.md](./inbox.md) | Legacy: Fetch email content |
+| `/aj_searchAll.php` | GET | [inbox.md](./inbox.md) | Legacy: Search all records |
+| `/aj_changepage_cases.php` | POST | [inbox.md](./inbox.md) | Legacy: Case pagination |
 
 ## Files Endpoints
 
@@ -222,6 +228,27 @@ This folder contains detailed documentation for all API endpoints in the Casewor
 | Endpoint | Method | File | Description |
 |----------|--------|------|-------------|
 | `/api/ajax/donotcontacttypes` | GET | [types.md](./types.md) | Get do not contact types |
+| `/aj_getgenders.php` | GET | [types.md](./types.md) | Get gender options |
+| `/aj_membershipTypes.php` | GET | [types.md](./types.md) | Get membership types |
+| `/aj_donationSources.php` | GET | [types.md](./types.md) | Get donation sources |
+| `/aj_donationTypes.php` | GET | [types.md](./types.md) | Get donation types |
+| `/aj_donationMethods.php` | GET | [types.md](./types.md) | Get donation methods |
+| `/aj_caseLocations.php` | GET | [types.md](./types.md) | Get case locations |
+
+## Configuration Endpoints
+
+| Endpoint | Method | File | Description |
+|----------|--------|------|-------------|
+| `/aj_config.php` | GET | [config.md](./config.md) | Get application configuration |
+| `/aj_getCurrentUser.php` | GET | [config.md](./config.md) | Get current user info |
+| `/aj_getAltSenderEmails.php` | GET | [config.md](./config.md) | Get alternate sender emails |
+| `/locales/en_GB.json` | GET | [config.md](./config.md) | Get localization strings |
+
+## External APIs
+
+| Endpoint | Method | File | Description |
+|----------|--------|------|-------------|
+| `ministers-dot-electedtechcaseworkermp.appspot.com/api/departments/uk` | GET | [departments.md](./departments.md) | Get UK government departments |
 
 ## Search Endpoints
 
@@ -360,6 +387,8 @@ cw_api_docs/
 │
 ├── # Types/Config
 ├── types.md                  # Type definitions
+├── config.md                 # Configuration and user endpoints
+├── departments.md            # External UK government departments API
 │
 └── # Search
     └── universal-search.md   # Universal search endpoint

@@ -320,3 +320,128 @@ Triggers email automation rules for inbox processing.
 ### Source Files
 
 - **Frontend API:** `scripts/api/src/inbox.js:114-123`
+
+---
+
+# Legacy PHP Endpoints
+
+The following endpoints are legacy PHP AJAX handlers used by the inbox functionality.
+
+---
+
+## Filter Emails by Caseworker
+
+**Endpoint:** `POST /aj_filterEmailCaseWorker.php`
+**Authentication:** Required (session cookie)
+
+### Description
+
+Filters inbox emails by caseworker assignment. Used to show only emails assigned to a specific caseworker.
+
+### Request Body
+
+Form-encoded POST data with caseworker filter parameters.
+
+### Response
+
+**Status:** `200 OK`
+
+Returns filtered email list based on caseworker assignment.
+
+---
+
+## Get Email Count
+
+**Endpoint:** `POST /aj_getNoEmails.php`
+**Authentication:** Required (session cookie)
+
+### Description
+
+Retrieves the count of emails in the inbox, typically used to display unread/unactioned email counts in the UI.
+
+### Request Body
+
+Form-encoded POST data with filter parameters.
+
+### Response
+
+**Status:** `200 OK`
+
+Returns the count of emails matching the specified criteria.
+
+---
+
+## Fetch Email Content
+
+**Endpoint:** `POST /aj_fetchemail.php`
+**Authentication:** Required (session cookie)
+
+### Description
+
+Fetches the full content of a specific email from the inbox. Used when opening an email to view its details.
+
+### Request Body
+
+Form-encoded POST data including the email ID to fetch.
+
+### Response
+
+**Status:** `200 OK`
+
+Returns the full email content including headers, body, and attachments.
+
+---
+
+## Search All Records
+
+**Endpoint:** `GET /aj_searchAll.php`
+**Authentication:** Required (session cookie)
+
+### Description
+
+Performs a universal search across records. Can be filtered to search only emails.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `term` | String | Yes | The search term to query |
+| `emailOnly` | Number | No | Set to `1` to search only email addresses |
+
+### Example Request
+
+```
+GET /aj_searchAll.php?emailOnly=1&term=example@gmail.com
+```
+
+### Response
+
+**Status:** `200 OK`
+
+Returns matching records based on the search term.
+
+### Notes
+
+- Used for autocomplete and quick lookup functionality
+- When `emailOnly=1`, searches email addresses across constituents and contacts
+
+---
+
+## Change Page (Cases)
+
+**Endpoint:** `POST /aj_changepage_cases.php`
+**Authentication:** Required (session cookie)
+
+### Description
+
+Handles pagination for case listings. Updates the current page view when navigating through case results.
+
+### Request Body
+
+Form-encoded POST data with pagination parameters.
+
+### Response
+
+**Status:** `200 OK`
+
+Returns the case data for the requested page.
