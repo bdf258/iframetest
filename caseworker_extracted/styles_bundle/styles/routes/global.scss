@@ -1,0 +1,22 @@
+.cke_reset_all {
+  .button-link-preview {
+    display: inline-block;
+    background: #1b809e;
+    margin: 15px auto;
+    text-align: center;
+    font-family: inherit !important;
+    font-size: inherit !important;
+  }
+
+  .cke_dialog_contents a.colorChooser {
+    width: auto;
+  }
+}
+
+.innercontainer.full-width{
+  margin: 0 auto;
+  min-width: unset;
+  max-width: unset;
+  width: unset;
+  padding: 0 20px;
+}

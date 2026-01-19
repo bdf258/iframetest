@@ -1,0 +1,34 @@
+body.inbox,
+body.writeletter,
+body.viewcase {
+  .cc,
+  .bcc {
+    display: none;
+  }
+  .to {
+    position: relative;
+    button {
+      background: transparent;
+      float: right;
+      border: 0;
+      top: 0;
+      position: absolute;
+      right: 0;
+      width: 30px;
+      text-align: center;
+      padding: 0;
+      color: #c0c0c0;
+      cursor: pointer;
+      height: calc(100% - 8px);
+      &:last-of-type {
+        right: 30px;
+      }
+    }
+  }
+  #bodyHolder{
+    table{
+      box-shadow: inherit;
+      border-radius: inherit;
+    }
+  }
+}
