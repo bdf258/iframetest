@@ -350,15 +350,6 @@ DELETE /api/ajax/tags/silent/7
 
 ---
 
-## Standard Tag IDs Reference
+## Tag IDs
 
-> **Note:** These ID mappings are placeholders. Verify against the actual backend API for production values.
-
-| ID | Tag |
-|----|-----|
-| 1 | Urgent |
-| 2 | VIP |
-| 3 | Follow-up Required |
-| 4 | Escalated |
-| 5 | Sensitive |
-| 6 | Media Interest |
+> **Note:** Tag IDs are dynamically created per installation. Use the Tags Search API (`POST /api/ajax/tags/search`) or Get Tag endpoint to retrieve available tags for your installation. There are no standard predefined tag IDs.

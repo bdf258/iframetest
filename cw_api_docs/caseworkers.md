@@ -26,16 +26,16 @@ GET /api/ajax/caseworkers
 ```json
 [
   {
-    "id": 1,
-    "name": "John Smith",
-    "initials": "JS",
-    "email": "john.smith@example.com"
+    "ID": "1",
+    "caseworkerName": "System",
+    "email": "",
+    "active": true
   },
   {
-    "id": 2,
-    "name": "Jane Doe",
-    "initials": "JD",
-    "email": "jane.doe@example.com"
+    "ID": "2",
+    "caseworkerName": "Alex Ballinger MP",
+    "email": "alex.ballinger.mp@parliament.uk",
+    "active": true
   }
 ]
 ```
@@ -44,10 +44,10 @@ GET /api/ajax/caseworkers
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | Number | Caseworker's unique identifier |
-| `name` | String | Caseworker's full name |
-| `initials` | String | Caseworker's initials |
+| `ID` | String | Caseworker's unique identifier |
+| `caseworkerName` | String | Caseworker's full name |
 | `email` | String | Caseworker's email address |
+| `active` | Boolean | Whether the caseworker is currently active |
 
 ### Legacy Endpoint
 
@@ -119,10 +119,10 @@ GET /api/ajax/caseworkers/forCase/42
 ```json
 [
   {
-    "id": 1,
-    "name": "John Smith",
-    "initials": "JS",
-    "email": "john.smith@example.com"
+    "ID": "1",
+    "caseworkerName": "System",
+    "email": "",
+    "active": true
   }
 ]
 ```
@@ -162,17 +162,15 @@ GET /api/ajax/caseworkers/all
 ```json
 [
   {
-    "id": 1,
-    "name": "John Smith",
-    "initials": "JS",
-    "email": "john.smith@example.com",
+    "ID": "1",
+    "caseworkerName": "System",
+    "email": "",
     "active": true
   },
   {
-    "id": 3,
-    "name": "Bob Wilson",
-    "initials": "BW",
-    "email": "bob.wilson@example.com",
+    "ID": "3",
+    "caseworkerName": "Stewart Holroyd",
+    "email": "stewart.holroyd@gmail.com",
     "active": false
   }
 ]
@@ -182,9 +180,8 @@ GET /api/ajax/caseworkers/all
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | Number | Caseworker's unique identifier |
-| `name` | String | Caseworker's full name |
-| `initials` | String | Caseworker's initials |
+| `ID` | String | Caseworker's unique identifier |
+| `caseworkerName` | String | Caseworker's full name |
 | `email` | String | Caseworker's email address |
 | `active` | Boolean | Whether the caseworker is currently active |
 

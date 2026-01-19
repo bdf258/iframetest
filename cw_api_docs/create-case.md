@@ -26,53 +26,67 @@ Creates a new case in the system, associating it with a constituent and assignin
 ### contactTypeID
 | ID | Contact Type |
 |----|--------------|
-| 1 | Phone |
-| 2 | Email |
-| 3 | In Person |
-| 4 | Letter |
-| 5 | Online Form |
-| 6 | Social Media |
+| 1 | Telephone - Personal |
+| 2 | Telephone - Work |
+| 3 | Mobile - Personal |
+| 4 | Email - Personal |
 
 ### caseTypeID
+
+> **Note:** Case type IDs vary by installation. Below are examples from a UK Parliament installation. Query your installation's configuration for actual values.
+
 | ID | Case Type |
 |----|-----------|
-| 1 | Housing |
-| 2 | Benefits |
-| 3 | Immigration |
-| 4 | Employment |
-| 5 | Healthcare |
-| 6 | Education |
-| 7 | Legal |
-| 8 | Other |
+| 64 | Agriculture, animals, food and rural affairs |
+| 65 | Asylum, immigration and nationality |
+| 66 | Business, industry and consumers |
+| 67 | Communities and families |
+| 68 | Crime, civil law, justice and rights |
+| 69 | Culture, charities, media and sport |
+| 70 | Defence |
+| 80 | Economy and finance |
+| 81 | Education |
+| 82 | Employment and training |
+| 83 | Energy, utilities and environment |
+| 84 | European Union |
+| 85 | Health services and medicine |
+| 86 | Housing and planning |
+| 87 | International affairs |
+| 88 | Parliament, government and politics |
+| 89 | Science and technology |
+| 90 | Social Security and pensions |
+| 91 | Social services and social care |
+| 92 | Transport |
+| 93 | Party issues |
+| 94 | Local Government |
+| 95 | Child Maintenance |
+| 96 | HMRC |
+| 1179 | Universal Credit |
+| 1180 | Bulk correspondence |
 
 ### statusID
-| ID | Status |
-|----|--------|
-| 1 | Open |
-| 2 | In Progress |
-| 3 | Pending Review |
-| 4 | On Hold |
-| 5 | Resolved |
-| 6 | Closed |
+| ID | Status | Closed |
+|----|--------|--------|
+| 1 | For Action | false |
+| 2 | Closed | true |
+| 3 | Waiting Reply | false |
+| 4 | Waiting | false |
 
 ### categoryTypeID
 | ID | Category |
 |----|----------|
-| 1 | Inquiry |
-| 2 | Complaint |
-| 3 | Request |
-| 4 | Follow-up |
-| 5 | Referral |
-| 6 | Emergency |
+| 1 | Casework |
+| 2 | Policy |
+| 3 | Campaign |
 
 ## Example Request
 
 ```json
 {
   "reviewDate": "2024-03-15",
-  "contactTypeID": 1,
+  "contactTypeID": 4,
   "constituentID": 5,
-  "caseTypeID": 1,
+  "caseTypeID": 86,
   "statusID": 1,
   "categoryTypeID": 1,
   "assignedToID": 2,
@@ -92,9 +106,9 @@ Returns the created case object with auto-generated fields:
   "caseID": 51,
   "summary": "Constituent requesting assistance with housing application",
   "status": 1,
-  "caseType": 1,
+  "caseType": 86,
   "category": 1,
-  "contactType": 1,
+  "contactType": 4,
   "created": "2024-01-15 10:30:00",
   "lastActioned": "2024-01-15 10:30:00",
   "reviewDate": "2024-03-15",

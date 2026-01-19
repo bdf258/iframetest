@@ -75,12 +75,12 @@ Retrieves all casenotes assigned to a specific case with pagination support.
 |-----------|------|----------|---------|-------------|
 | `page` | Number | No | 1 | The page number to retrieve |
 | `limit` | Number | No | - | Number of results per page |
-| `orderBy` | String | No | - | Field to sort results by |
+| `orderBy` | String | No | `"DESC"` | Sort direction: `"ASC"` (oldest first) or `"DESC"` (newest first) |
 
 ### Example Request
 
 ```
-GET /api/ajax/cases/42/casenotes?page=1&limit=10&orderBy=created
+GET /api/ajax/cases/42/casenotes?page=1&orderBy=DESC
 ```
 
 ### Response
