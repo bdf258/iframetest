@@ -335,18 +335,18 @@ Adds a new contact detail (phone, email, address) to a constituent.
 
 ### Contact Type IDs
 
-| ID | Type |
-|----|------|
-| 1 | Phone |
-| 2 | Email |
-| 3 | Address |
-| 4 | Mobile |
+| ID | Type | Primary Field |
+|----|------|---------------|
+| 1 | Telephone - Personal | telephone |
+| 2 | Telephone - Work | telephoneWork |
+| 3 | Mobile - Personal | mobile |
+| 4 | Email - Personal | email |
 
 ### Example Request
 
 ```json
 {
-  "contactTypeID": 2,
+  "contactTypeID": 4,
   "constituentID": 100,
   "value": "secondary.email@example.com",
   "source": "Constituent provided"
