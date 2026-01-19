@@ -1,0 +1,38 @@
+body.constituents {
+  .half {
+    label {
+      width: 88px;
+    }
+    select {
+      display: inline-block;
+      width: 162px !important;
+    }
+  }
+  .full {
+    label {
+      width: 88px;
+    }
+    select {
+      width: 422px !important;
+    }
+  }
+  #indent{
+    .mapHolder {
+      table{
+        border-radius: 0;
+
+        &.navigation {
+          tbody tr {
+            background-color: #888889 !important;
+
+            td,
+            a {
+              color: white;
+              background-color: transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+}

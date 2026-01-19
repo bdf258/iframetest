@@ -1,0 +1,378 @@
+body.admin .indent>div {
+  vertical-align: top;
+}
+
+body.editemailtemplate #edittemplateForm,
+body.editemailtemplate #edittemplateForm+div,
+body.editemailtemplate #edittemplateForm>div {
+  display: block;
+  margin: 0 auto;
+}
+
+body.editemailtemplate #edittemplateForm h3 {
+  margin-left: -15px;
+}
+
+body.editemailtemplate #edittemplateForm fieldset {
+  width: calc(100% - 22px);
+}
+
+body.editletterhead span.remove {
+  font-size: 80%;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+body.emailStatistics #emailDetail label {
+  height: 32px;
+  width: 107px;
+}
+
+.cke_reset_all .button-link-preview {
+  display: inline-block;
+  background: #1b809e;
+  margin: 15px auto;
+  text-align: center;
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
+.cke_reset_all .cke_dialog_contents a.colorChooser {
+  width: auto;
+}
+
+.innercontainer.full-width {
+  margin: 0 auto;
+  min-width: unset;
+  max-width: unset;
+  width: unset;
+  padding: 0 20px;
+}
+
+body.inbox .cc,
+body.inbox .bcc,
+body.writeletter .cc,
+body.writeletter .bcc,
+body.viewcase .cc,
+body.viewcase .bcc {
+  display: none;
+}
+
+body.inbox .to,
+body.writeletter .to,
+body.viewcase .to {
+  position: relative;
+}
+
+body.inbox .to button,
+body.writeletter .to button,
+body.viewcase .to button {
+  background: rgba(0,0,0,0);
+  float: right;
+  border: 0;
+  top: 0;
+  position: absolute;
+  right: 0;
+  width: 30px;
+  text-align: center;
+  padding: 0;
+  color: silver;
+  cursor: pointer;
+  height: calc(100% - 8px);
+}
+
+body.inbox .to button:last-of-type,
+body.writeletter .to button:last-of-type,
+body.viewcase .to button:last-of-type {
+  right: 30px;
+}
+
+body.inbox #bodyHolder table,
+body.writeletter #bodyHolder table,
+body.viewcase #bodyHolder table {
+  box-shadow: inherit;
+  border-radius: inherit;
+}
+
+.manageFlags label {
+  width: 300px;
+}
+
+.manageFlags .select2 {
+  width: 300px !important;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.manageFlags .select2-results__option[aria-selected=true] {
+  display: none;
+}
+
+body.manageSegmentFilters .col-half {
+  width: 49.5%;
+  display: inline-block;
+}
+
+body.phoneStatistics {
+  margin-bottom: 50px;
+}
+
+@media (min-width: 900px) {
+  body.phoneStatistics .innercontainer {
+    width: 900px;
+  }
+}
+
+body.phoneStatistics table {
+  width: 600px;
+  margin-left: 0px;
+  margin-bottom: 30px;
+}
+
+body.phoneStatistics table thead tr th {
+  background: #7a7a7a;
+  border-bottom: 1px solid #7a7a7a;
+  color: #fff;
+  padding: 5px 5px 5px 18px;
+  text-align: left;
+}
+
+body.phoneStatistics table tbody td {
+  text-align: left;
+  padding: 5px 5px 5px 18px;
+}
+
+body.phoneStatistics table tbody td.clickable {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+body.phoneStatistics table tbody td.count {
+  text-align: center;
+}
+
+body.phoneStatistics .inline-block {
+  display: inline-block;
+}
+
+body.phoneStatistics .text-right {
+  text-align: right;
+}
+
+body.phoneStatistics .half {
+  width: 50%;
+}
+
+body.phoneStatistics .small {
+  font-size: 70%;
+}
+
+body.phoneStatistics .dataTables_wrapper label {
+  display: inline;
+  background-color: rgba(0,0,0,0);
+}
+
+body.phoneStatistics .dataTables_wrapper .paginate_button {
+  padding: .1em .5em;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th {
+  font-weight: 300;
+  text-align: left;
+  padding-left: 18px;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc {
+  background-image: none;
+  position: relative;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting:before,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting:after,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc:before,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc:after,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc:before,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc:after {
+  content: "";
+  border-left: 5px solid rgba(0,0,0,0);
+  border-right: 5px solid rgba(0,0,0,0);
+  border-top: 5px solid rgba(255,255,255,.3);
+  display: inline-block;
+  margin-bottom: 1px;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 3px;
+  top: 15px;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting:after,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc:after,
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc:after {
+  border-top: 0;
+  border-bottom: 5px solid rgba(255,255,255,.3);
+  top: 8px;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc:before {
+  border-top: 5px solid rgba(255,255,255,0);
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_asc:after {
+  border-bottom: 5px solid #fff;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc:before {
+  border-top: 5px solid #fff;
+}
+
+body.phoneStatistics .dataTables_wrapper thead tr th.sorting_desc:after {
+  border-bottom: 5px solid rgba(255,255,255,0);
+}
+
+body.phoneStatistics .dataTables_wrapper tfoot th {
+  border-top: 1px solid #7a7a7a;
+  padding-left: 18px;
+  text-align: left;
+}
+
+body.constituents .half label {
+  width: 88px;
+}
+
+body.constituents .half select {
+  display: inline-block;
+  width: 162px !important;
+}
+
+body.constituents .full label {
+  width: 88px;
+}
+
+body.constituents .full select {
+  width: 422px !important;
+}
+
+body.constituents #indent .mapHolder table {
+  border-radius: 0;
+}
+
+body.constituents #indent .mapHolder table.navigation tbody tr {
+  background-color: #888889 !important;
+}
+
+body.constituents #indent .mapHolder table.navigation tbody tr td,
+body.constituents #indent .mapHolder table.navigation tbody tr a {
+  color: #fff;
+  background-color: rgba(0,0,0,0);
+}
+
+body.surveyResults .segmentCard p {
+  margin: 0;
+}
+
+body.viewcase .material-icons {
+  padding-top: 5px;
+  color: #7a7a7a;
+}
+
+body.viewcase .material-icons.f60 {
+  font-size: 52px;
+  float: left;
+  margin-right: 10px;
+  max-width: 52px;
+}
+
+body.viewcase .material-icons.red {
+  background: rgba(0,0,0,0);
+  color: red;
+}
+
+body.viewcase .material-icons.orange {
+  background: rgba(0,0,0,0);
+  color: orange;
+}
+
+body.viewcase .material-icons.green {
+  background: rgba(0,0,0,0);
+  color: green;
+}
+
+body.viewcase .d-flex,
+body.viewcase .to,
+body.viewcase .cc,
+body.viewcase .bcc {
+  display: flex;
+}
+
+body.viewcase .d-flex input,
+body.viewcase .to input,
+body.viewcase .cc input,
+body.viewcase .bcc input {
+  flex: 1;
+  width: unset;
+}
+
+body.viewcase .inactive {
+  display: none;
+}
+
+body.viewcase .btn.editReviewDates+.close {
+  float: right;
+  margin-right: 10px;
+}
+
+body.viewconstituent select.updateCustomSelectField+span.select2 {
+  flex-grow: 1;
+  margin-right: 2%;
+  width: unset;
+}
+
+body.viewconstituent select.updateCustomSelectField.createMembershipField+span.select2 {
+  margin-right: 0;
+}
+
+body.viewconstituent #mergeConstituent {
+  width: 700px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  top: 150px;
+}
+
+body.viewconstituent .editMembershipFormContainer .inputContainerMembership,
+body.viewconstituent .createMembershipFormContainer .inputContainerMembership {
+  display: flex;
+}
+
+body.viewconstituent .editMembershipFormContainer .inputContainerMembership>span,
+body.viewconstituent .createMembershipFormContainer .inputContainerMembership>span {
+  width: unset !important;
+  flex-grow: 1;
+}
+
+body.viewconstituent .editMembershipFormContainer .inputLabelMembership,
+body.viewconstituent .createMembershipFormContainer .inputLabelMembership {
+  width: 130px;
+}
+
+body.viewconstituent .editMembershipFormContainer .textareaInputsMembership,
+body.viewconstituent .createMembershipFormContainer .textareaInputsMembership {
+  margin-top: 0;
+  height: 150px;
+}
+
+body.viewconstituent .editMembershipFormContainer .inputMembership,
+body.viewconstituent .createMembershipFormContainer .inputMembership {
+  flex-grow: 1;
+}
+
+body.viewconstituent .editMembershipFormContainer .pseudoInputMembership,
+body.viewconstituent .createMembershipFormContainer .pseudoInputMembership {
+  min-height: 20px;
+  margin-bottom: 5px;
+  font-size: 80%;
+}
+

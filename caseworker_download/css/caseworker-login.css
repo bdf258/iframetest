@@ -1,0 +1,36 @@
+body {
+    background: #32318F;
+    background-image: url("../imgs/caseworker-login-background.jpg");
+    background-repeat: no-repeat;
+  background-attachment: fixed; 
+  background-size: 100% 100%;
+}
+#navbar {
+    box-shadow: none!important;
+    background: transparent;
+    position: unset;
+}
+
+.logoHolder {
+    width: 100%;
+    text-align: center;
+}
+
+.topLogo {
+    margin-left: 0px!important;
+    margin-top: 50px!important;
+    height: 45px!important;
+}
+
+#footer {
+    background: transparent;
+}
+
+.loginpageModal {
+background: white;
+border-radius: 20px;
+}
+
+.innerContainer {
+    min-height: calc(100vh - 185px)
+}
