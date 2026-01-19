@@ -165,10 +165,10 @@ CREATE TABLE Casenotes (
 CREATE TABLE Emails (
     id INT PRIMARY KEY AUTO_INCREMENT,
     caseID INT DEFAULT NULL,
-    toAddresses JSON COMMENT 'Array of recipient email addresses',
-    ccAddresses JSON COMMENT 'Array of CC email addresses',
-    bccAddresses JSON COMMENT 'Array of BCC email addresses',
-    fromAddress VARCHAR(255),
+    `to` JSON COMMENT 'Array of recipient email addresses (API uses "to" not "toAddresses")',
+    cc JSON COMMENT 'Array of CC email addresses (API uses "cc" not "ccAddresses")',
+    bcc JSON COMMENT 'Array of BCC email addresses (API uses "bcc" not "bccAddresses")',
+    `from` VARCHAR(255) COMMENT 'API uses "from" not "fromAddress"',
     subject VARCHAR(500),
     htmlBody LONGTEXT,
     type ENUM('inbox', 'draft', 'sent', 'scheduled') DEFAULT 'inbox',
@@ -194,13 +194,18 @@ CREATE TABLE EmailAttachments (
 CREATE TABLE Letters (
     id INT PRIMARY KEY AUTO_INCREMENT,
     caseID INT NOT NULL,
+    letterheadId INT DEFAULT NULL,
+    reference VARCHAR(500) COMMENT 'Letter reference code',
+    `text` LONGTEXT COMMENT 'Letter body content (API uses "text" not "content")',
+    footer LONGTEXT COMMENT 'Letter footer content',
     signed BOOLEAN DEFAULT FALSE,
-    content LONGTEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (caseID) REFERENCES Cases(id) ON DELETE CASCADE
+    FOREIGN KEY (caseID) REFERENCES Cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (letterheadId) REFERENCES Letterheads(id)
 );
 
+-- NOTE: API uses /casefiles/ endpoint path, not /files/
 CREATE TABLE Files (
     id INT PRIMARY KEY AUTO_INCREMENT,
     caseID INT NOT NULL,
@@ -216,18 +221,22 @@ CREATE TABLE ReviewDates (
     id INT PRIMARY KEY AUTO_INCREMENT,
     caseID INT NOT NULL,
     reviewDate DATETIME NOT NULL,
+    note TEXT COMMENT 'Note to appear on the review date',
+    assignedTo INT DEFAULT NULL COMMENT 'User ID the review is assigned to',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (caseID) REFERENCES Cases(id) ON DELETE CASCADE
+    FOREIGN KEY (caseID) REFERENCES Cases(id) ON DELETE CASCADE,
+    FOREIGN KEY (assignedTo) REFERENCES Caseworkers(id)
 );
 
 -- ==========================================
 -- TAGGING & FLAGS
 -- ==========================================
 
+-- NOTE: API uses field name "tag" not "name" in payloads
 CREATE TABLE Tags (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
+    tag VARCHAR(255) NOT NULL COMMENT 'API uses "tag" field name',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -240,9 +249,10 @@ CREATE TABLE CaseTags (
     FOREIGN KEY (tagID) REFERENCES Tags(id) ON DELETE CASCADE
 );
 
+-- NOTE: API uses field name "flag" not "name" in payloads
 CREATE TABLE Flags (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
+    flag VARCHAR(255) NOT NULL COMMENT 'API uses "flag" field name',
     isPersonal BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

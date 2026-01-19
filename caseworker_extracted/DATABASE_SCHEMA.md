@@ -68,7 +68,9 @@ People who contact the MP's office.
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT (PK) | Primary key |
-| geocode | JSON | Geographic coordinates |
+| geocode_lat | DECIMAL | Geographic latitude |
+| geocode_lng | DECIMAL | Geographic longitude |
+| geocode_data | JSON | Additional geographic data |
 | (other fields via ContactDetails) | | |
 
 ### Casenotes
@@ -129,10 +131,16 @@ Physical letter correspondence.
 |--------|------|-------------|
 | id | INT (PK) | Primary key |
 | caseID | INT (FK) | Reference to Cases |
+| letterheadId | INT (FK) | Reference to Letterheads |
+| reference | VARCHAR | Letter reference code |
+| text | TEXT | Letter body content (API uses 'text', not 'content') |
+| footer | TEXT | Letter footer content |
 | signed | BOOLEAN | Whether letter is signed |
 
 ### Files
 Case file attachments.
+
+> **Note**: API uses `/casefiles/` path prefix, not `/files/`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -151,6 +159,8 @@ Scheduled case review dates.
 | id | INT (PK) | Primary key |
 | caseID | INT (FK) | Reference to Cases |
 | reviewDate | DATETIME | Review date |
+| note | TEXT | Note to appear on the review date |
+| assignedTo | INT (FK) | User ID the review is assigned to |
 
 ### Connections
 Relationships between constituents.
@@ -266,10 +276,12 @@ User groups for permissions.
 ### Tags
 Case tagging system.
 
+> **Note**: API uses field name `tag`, not `name`
+
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT (PK) | Primary key |
-| name | VARCHAR | Tag name |
+| tag | VARCHAR | Tag text (API field name) |
 
 ### CaseTags (Junction)
 Many-to-many relationship between cases and tags.
@@ -282,10 +294,13 @@ Many-to-many relationship between cases and tags.
 ### Flags
 Personal/case flags.
 
+> **Note**: API uses field name `flag`, not `name`
+
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INT (PK) | Primary key |
-| name | VARCHAR | Flag name |
+| flag | VARCHAR | Flag text (API field name) |
+| isPersonal | BOOLEAN | Whether this is a personal flag |
 
 ### CustomFields
 Dynamic field definitions.
@@ -464,6 +479,10 @@ See `api/src/*.js` files for complete API documentation. Key endpoints include:
 - `/emails` - Email handling
 - `/inbox` - Inbox management
 - `/categorytype`, `/casetype`, `/statustype` - Categorisation
-- `/tags`, `/flags` - Tagging
+- `/tags`, `/flags` - Tagging (includes `/managetags/*` and `/manageflags/*` for bulk operations)
 - `/customfields` - Dynamic fields
 - `/segments` - Saved filters
+- `/casefiles` - File attachments (note: uses `/casefiles/` not `/files/`)
+- `/reviewDates` - Review date management (includes `/forCase/:caseID`, `/complete`, `/incomplete`)
+- `/letters` - Letter management (includes `/pdf` and `/pdf/signed` endpoints)
+- `/connections` - Constituent relationships (includes `/fromconstituentid/:id`)

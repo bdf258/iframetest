@@ -118,10 +118,10 @@
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "caseID": { "type": "integer", "nullable": true, "foreignKey": "Cases.id" },
-        "toAddresses": { "type": "json", "nullable": true, "description": "Array of recipient addresses" },
-        "ccAddresses": { "type": "json", "nullable": true },
-        "bccAddresses": { "type": "json", "nullable": true },
-        "fromAddress": { "type": "varchar(255)", "nullable": true },
+        "to": { "type": "json", "nullable": true, "description": "Array of recipient email addresses", "note": "API uses 'to' not 'toAddresses'" },
+        "cc": { "type": "json", "nullable": true, "description": "Array of CC email addresses", "note": "API uses 'cc' not 'ccAddresses'" },
+        "bcc": { "type": "json", "nullable": true, "description": "Array of BCC email addresses", "note": "API uses 'bcc' not 'bccAddresses'" },
+        "from": { "type": "varchar(255)", "nullable": true, "note": "API uses 'from' not 'fromAddress'" },
         "subject": { "type": "varchar(500)", "nullable": true },
         "htmlBody": { "type": "longtext", "nullable": true },
         "type": { "type": "enum", "values": ["inbox", "draft", "sent", "scheduled"], "default": "inbox" },
@@ -130,6 +130,9 @@
         "scheduledAt": { "type": "datetime", "nullable": true },
         "created_at": { "type": "timestamp", "nullable": false },
         "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "relationships": {
+        "attachments": { "type": "hasMany", "entity": "EmailAttachments", "foreignKey": "emailId" }
       },
       "apiEndpoints": [
         "GET /emails/:id",
@@ -148,6 +151,25 @@
         "POST /emails/bulkactions/delete",
         "GET /emails/attachments/:id/content",
         "DELETE /emails/attachments/:id"
+      ]
+    },
+
+    "EmailAttachments": {
+      "description": "Files attached to emails",
+      "tableName": "email_attachments",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "emailId": { "type": "integer", "nullable": false, "foreignKey": "Emails.id" },
+        "content": { "type": "longtext", "nullable": true, "description": "Base64 encoded file content" },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "type": { "type": "varchar(100)", "nullable": true, "description": "MIME type" },
+        "created_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /emails/attachments/:id/content",
+        "DELETE /emails/attachments/:id",
+        "POST /emails/:emailId/attach"
       ]
     },
 
@@ -246,14 +268,19 @@
       "primaryKey": "id",
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
-        "name": { "type": "varchar(255)", "nullable": false },
+        "tag": { "type": "varchar(255)", "nullable": false, "note": "API uses 'tag' field name, not 'name'" },
         "created_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /tags",
+        "GET /tags/:id",
         "POST /tags",
-        "PATCH /tags/:id",
-        "DELETE /tags/:id"
+        "PATCH /tags",
+        "DELETE /tags/:id",
+        "POST /tags/search",
+        "POST /managetags/merge",
+        "POST /managetags/delete",
+        "DELETE /tags/silent/:id"
       ]
     },
 
@@ -263,15 +290,20 @@
       "primaryKey": "id",
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
-        "name": { "type": "varchar(255)", "nullable": false },
+        "flag": { "type": "varchar(255)", "nullable": false, "note": "API uses 'flag' field name, not 'name'" },
         "isPersonal": { "type": "boolean", "default": false },
         "created_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /flags",
+        "GET /flags/:id",
         "POST /flags",
-        "PATCH /flags/:id",
-        "DELETE /flags/:id"
+        "PATCH /flags",
+        "DELETE /flags/:id",
+        "POST /flags/search",
+        "POST /manageflags/merge",
+        "POST /manageflags/delete",
+        "POST /flags/flagsToSegment"
       ]
     },
 
@@ -340,13 +372,21 @@
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
         "reviewDate": { "type": "datetime", "nullable": false },
+        "note": { "type": "text", "nullable": true, "description": "The note to appear on the review date" },
+        "assignedTo": { "type": "integer", "nullable": true, "foreignKey": "Caseworkers.id", "description": "The user ID the review is assigned to" },
         "created_at": { "type": "timestamp", "nullable": false },
         "updated_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
-        "POST /reviewdates",
-        "PATCH /reviewdates/:id",
-        "DELETE /reviewdates/:id"
+        "GET /reviewDates/:id",
+        "POST /reviewDates",
+        "PATCH /reviewDates/:id",
+        "DELETE /reviewDates/:id",
+        "GET /reviewDates/forCase/:caseID",
+        "POST /reviewDates/forCase/:caseID",
+        "POST /reviewDates/forCase/:caseID/update",
+        "POST /reviewDates/:id/complete",
+        "POST /reviewDates/:id/incomplete"
       ]
     },
 
@@ -362,9 +402,65 @@
         "created_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
+        "GET /connections/fromconstituentid/:id",
         "POST /connections",
         "DELETE /connections/:id"
       ]
+    },
+
+    "ContactTypes": {
+      "description": "Types of contact details (email, phone, address, etc.)",
+      "tableName": "contact_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "DoNotContactTypes": {
+      "description": "Types of do-not-contact preferences",
+      "tableName": "do_not_contact_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "ConnectionTypes": {
+      "description": "Types of constituent relationships",
+      "tableName": "connection_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "RoleTypes": {
+      "description": "Constituent role types",
+      "tableName": "role_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "OrganisationTypes": {
+      "description": "Types of organisations",
+      "tableName": "organisation_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
     },
 
     "Letters": {
@@ -374,15 +470,20 @@
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
+        "letterheadId": { "type": "integer", "nullable": true, "foreignKey": "Letterheads.id" },
+        "reference": { "type": "varchar(500)", "nullable": true, "description": "Letter reference code" },
+        "text": { "type": "longtext", "nullable": true, "note": "API uses 'text' field name, not 'content'" },
+        "footer": { "type": "longtext", "nullable": true, "description": "Letter footer content" },
         "signed": { "type": "boolean", "default": false },
-        "content": { "type": "longtext", "nullable": true },
         "created_at": { "type": "timestamp", "nullable": false },
         "updated_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /letters/:id",
         "POST /letters",
-        "PATCH /letters/:id"
+        "PATCH /letters/:id",
+        "GET /letters/:id/pdf",
+        "GET /letters/:id/pdf/signed"
       ]
     },
 
@@ -400,10 +501,13 @@
         "created_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
-        "GET /files/:id",
-        "POST /files",
-        "DELETE /files/:id"
-      ]
+        "GET /casefiles/:id",
+        "GET /casefiles/:id/content",
+        "POST /casefiles",
+        "PATCH /casefiles/:id",
+        "DELETE /casefiles/:id"
+      ],
+      "note": "API uses /casefiles/ path prefix, not /files/"
     },
 
     "EmailTemplates": {
@@ -537,6 +641,65 @@
         "name": { "type": "varchar(255)", "nullable": false },
         "configuration": { "type": "json", "nullable": true },
         "active": { "type": "boolean", "default": true }
+      }
+    },
+
+    "DoorknockingResults": {
+      "description": "Doorknocking response data",
+      "tableName": "doorknocking_results",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "surveyID": { "type": "integer", "nullable": false, "foreignKey": "DoorknockingSurveys.id" },
+        "responseData": { "type": "json", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "RSS": {
+      "description": "RSS feed subscriptions",
+      "tableName": "rss",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "url": { "type": "varchar(500)", "nullable": false },
+        "name": { "type": "varchar(255)", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "Behalfs": {
+      "description": "Acting on behalf of another entity",
+      "tableName": "behalfs",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "Membership": {
+      "description": "Membership data for constituents",
+      "tableName": "membership",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "constituentID": { "type": "integer", "nullable": true, "foreignKey": "Constituents.id" },
+        "secondaryBranch": { "type": "varchar(255)", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "Organisations": {
+      "description": "Organisation records",
+      "tableName": "organisations",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "organisationTypeID": { "type": "integer", "nullable": true, "foreignKey": "OrganisationTypes.id" },
+        "created_at": { "type": "timestamp", "nullable": false }
       }
     }
   },
