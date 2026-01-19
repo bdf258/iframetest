@@ -1,0 +1,699 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CaseWorker MP Database Schema",
+  "description": "Inferred database schema from frontend source code analysis of aballinger.caseworkermp.com",
+  "version": "1.0.0",
+  "extractedFrom": "https://aballinger.caseworkermp.com",
+  "extractedDate": "2026-01-19",
+  "note": "This schema was reverse-engineered from frontend code. Actual database implementation may differ.",
+
+  "entities": {
+    "Cases": {
+      "description": "Primary entity for tracking constituent issues",
+      "tableName": "cases",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "constituentID": { "type": "integer", "nullable": false, "foreignKey": "Constituents.id" },
+        "contactTypeID": { "type": "integer", "nullable": true, "foreignKey": "ContactTypes.id", "note": "Stored as enquirytypeID in legacy code" },
+        "caseTypeID": { "type": "integer", "nullable": true, "foreignKey": "CaseTypes.id" },
+        "statusID": { "type": "integer", "nullable": true, "foreignKey": "StatusTypes.id" },
+        "categoryTypeID": { "type": "integer", "nullable": true, "foreignKey": "CategoryTypes.id" },
+        "assignedToID": { "type": "integer", "nullable": true, "foreignKey": "Caseworkers.id" },
+        "summary": { "type": "text", "nullable": true },
+        "reviewDate": { "type": "datetime", "nullable": true },
+        "restrictions": { "type": "json", "nullable": true },
+        "customFields": { "type": "json", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" },
+        "updated_at": { "type": "timestamp", "nullable": false, "default": "CURRENT_TIMESTAMP" }
+      },
+      "relationships": {
+        "constituent": { "type": "belongsTo", "entity": "Constituents", "foreignKey": "constituentID" },
+        "caseType": { "type": "belongsTo", "entity": "CaseTypes", "foreignKey": "caseTypeID" },
+        "status": { "type": "belongsTo", "entity": "StatusTypes", "foreignKey": "statusID" },
+        "category": { "type": "belongsTo", "entity": "CategoryTypes", "foreignKey": "categoryTypeID" },
+        "assignedTo": { "type": "belongsTo", "entity": "Caseworkers", "foreignKey": "assignedToID" },
+        "casenotes": { "type": "hasMany", "entity": "Casenotes", "foreignKey": "caseID" },
+        "tags": { "type": "belongsToMany", "entity": "Tags", "through": "CaseTags" },
+        "reviewDates": { "type": "hasMany", "entity": "ReviewDates", "foreignKey": "caseID" },
+        "files": { "type": "hasMany", "entity": "Files", "foreignKey": "caseID" },
+        "letters": { "type": "hasMany", "entity": "Letters", "foreignKey": "caseID" }
+      },
+      "apiEndpoints": [
+        "GET /cases/:id",
+        "POST /cases",
+        "PATCH /cases/:id",
+        "DELETE /cases/:id",
+        "POST /cases/search",
+        "GET /cases/search/:searchTerm",
+        "POST /cases/:id/merge",
+        "GET /cases/statistics/casetype/:caseTypeID"
+      ]
+    },
+
+    "Constituents": {
+      "description": "People who contact the MP's office",
+      "tableName": "constituents",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "geocode_lat": { "type": "decimal", "nullable": true },
+        "geocode_lng": { "type": "decimal", "nullable": true },
+        "geocode_data": { "type": "json", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "relationships": {
+        "cases": { "type": "hasMany", "entity": "Cases", "foreignKey": "constituentID" },
+        "contactDetails": { "type": "hasMany", "entity": "ContactDetails", "foreignKey": "constituentID" },
+        "connectionsAsParent": { "type": "hasMany", "entity": "Connections", "foreignKey": "parentID" },
+        "connectionsAsChild": { "type": "hasMany", "entity": "Connections", "foreignKey": "childID" }
+      },
+      "apiEndpoints": [
+        "GET /constituents/:id",
+        "POST /constituents",
+        "PATCH /constituents/:id",
+        "POST /constituents/search",
+        "POST /constituents/initRequest",
+        "DELETE /constituent/:id/geocode",
+        "GET /constituents/:id/contactDetails",
+        "GET /constituent/:id/merge",
+        "POST /constituent/:id/merge"
+      ]
+    },
+
+    "Casenotes": {
+      "description": "Polymorphic table for all case activity items",
+      "tableName": "casenotes",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
+        "type": { "type": "enum", "values": ["note", "email", "letter", "file", "appointment", "reviewDate"], "nullable": false },
+        "subtypeID": { "type": "integer", "nullable": true, "note": "Secondary ID for reviewDate type" },
+        "detail": { "type": "json", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /casenotes/:id",
+        "PATCH /casenotes/:id",
+        "DELETE /casenotes/:id",
+        "GET /cases/:caseID/casenotes",
+        "GET /cases/:caseID/notes",
+        "POST /cases/:caseID/notes",
+        "GET /cases/:caseID/appointments",
+        "GET /cases/:caseID/files",
+        "GET /cases/:caseID/emails",
+        "GET /cases/:caseID/letters",
+        "GET /cases/:caseID/reviewDates",
+        "GET /cases/:caseID/attachments"
+      ]
+    },
+
+    "Emails": {
+      "description": "Email correspondence tracking",
+      "tableName": "emails",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseID": { "type": "integer", "nullable": true, "foreignKey": "Cases.id" },
+        "toAddresses": { "type": "json", "nullable": true, "description": "Array of recipient addresses" },
+        "ccAddresses": { "type": "json", "nullable": true },
+        "bccAddresses": { "type": "json", "nullable": true },
+        "fromAddress": { "type": "varchar(255)", "nullable": true },
+        "subject": { "type": "varchar(500)", "nullable": true },
+        "htmlBody": { "type": "longtext", "nullable": true },
+        "type": { "type": "enum", "values": ["inbox", "draft", "sent", "scheduled"], "default": "inbox" },
+        "actioned": { "type": "boolean", "default": false },
+        "assignedTo": { "type": "integer", "nullable": true, "foreignKey": "Caseworkers.id" },
+        "scheduledAt": { "type": "datetime", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /emails/:id",
+        "POST /emails",
+        "PATCH /emails/:id",
+        "DELETE /emails/:id",
+        "POST /emails/:id/send",
+        "POST /emails/:id/attach",
+        "POST /emails/search",
+        "POST /emails/sendtest",
+        "POST /emails/checkEmailMergeCodes",
+        "POST /emails/getEmailBody",
+        "GET /emails/:id/cancel",
+        "POST /emails/:id/cancel",
+        "POST /emails/bulkactions/markasactioned",
+        "POST /emails/bulkactions/delete",
+        "GET /emails/attachments/:id/content",
+        "DELETE /emails/attachments/:id"
+      ]
+    },
+
+    "ContactDetails": {
+      "description": "Constituent contact information",
+      "tableName": "contact_details",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "constituentID": { "type": "integer", "nullable": false, "foreignKey": "Constituents.id" },
+        "contactTypeID": { "type": "integer", "nullable": false, "foreignKey": "ContactTypes.id" },
+        "value": { "type": "varchar(500)", "nullable": false },
+        "source": { "type": "varchar(255)", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "POST /contactDetails",
+        "PATCH /contactDetails/:id",
+        "DELETE /contactDetails/:id"
+      ]
+    },
+
+    "CategoryTypes": {
+      "description": "Top-level case categorization",
+      "tableName": "category_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "categorytype": { "type": "varchar(255)", "nullable": false },
+        "reviewInDays": { "type": "integer", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /categorytype",
+        "GET /categorytype/:id",
+        "POST /categorytype",
+        "PATCH /categorytype/:id",
+        "POST /categorytype/delete/:id",
+        "DELETE /categorytype/:id",
+        "DELETE /categorytype/:id/:mergeID"
+      ]
+    },
+
+    "CaseTypes": {
+      "description": "Case type within a category",
+      "tableName": "case_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "casetype": { "type": "varchar(255)", "nullable": false },
+        "categorytypeID": { "type": "integer", "nullable": false, "foreignKey": "CategoryTypes.id" },
+        "retentionMonths": { "type": "integer", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /casetype",
+        "GET /casetype/:id",
+        "POST /casetype",
+        "PATCH /casetype/:id",
+        "POST /casetype/delete/:id",
+        "DELETE /casetype/:id",
+        "DELETE /casetype/:id/:mergeID"
+      ]
+    },
+
+    "StatusTypes": {
+      "description": "Case status options",
+      "tableName": "status_types",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "statustype": { "type": "varchar(255)", "nullable": false },
+        "categorytypeID": { "type": "integer", "nullable": false, "foreignKey": "CategoryTypes.id" },
+        "retentionMonths": { "type": "integer", "nullable": true },
+        "closed": { "type": "boolean", "default": false },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /statustype",
+        "GET /statustype/:id",
+        "POST /statustype",
+        "PATCH /statustype/:id",
+        "POST /statustype/delete/:id",
+        "DELETE /statustype/:id",
+        "DELETE /statustype/:id/:mergeID"
+      ]
+    },
+
+    "Tags": {
+      "description": "Case tagging system",
+      "tableName": "tags",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /tags",
+        "POST /tags",
+        "PATCH /tags/:id",
+        "DELETE /tags/:id"
+      ]
+    },
+
+    "Flags": {
+      "description": "Personal and case flags",
+      "tableName": "flags",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "isPersonal": { "type": "boolean", "default": false },
+        "created_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /flags",
+        "POST /flags",
+        "PATCH /flags/:id",
+        "DELETE /flags/:id"
+      ]
+    },
+
+    "Caseworkers": {
+      "description": "Staff members who handle cases",
+      "tableName": "caseworkers",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "email": { "type": "varchar(255)", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /caseworkers"
+      ]
+    },
+
+    "CustomFields": {
+      "description": "Dynamic field definitions",
+      "tableName": "custom_fields",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "fieldType": { "type": "varchar(50)", "nullable": false },
+        "validation": { "type": "json", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "POST /customfields",
+        "PATCH /customfields/:id",
+        "POST /customfields/bulkedit",
+        "POST /customfields/test"
+      ]
+    },
+
+    "Segments": {
+      "description": "Saved search/filter criteria",
+      "tableName": "segments",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "type": { "type": "varchar(100)", "nullable": false },
+        "category": { "type": "varchar(100)", "nullable": false },
+        "value1Type": { "type": "varchar(100)", "nullable": true },
+        "value1Show": { "type": "varchar(255)", "nullable": true },
+        "value1Default": { "type": "varchar(255)", "nullable": true },
+        "value2Type": { "type": "varchar(100)", "nullable": true },
+        "value2Show": { "type": "varchar(255)", "nullable": true },
+        "value2Default": { "type": "varchar(255)", "nullable": true },
+        "filterType": { "type": "varchar(100)", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      }
+    },
+
+    "ReviewDates": {
+      "description": "Scheduled case review dates",
+      "tableName": "review_dates",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
+        "reviewDate": { "type": "datetime", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "POST /reviewdates",
+        "PATCH /reviewdates/:id",
+        "DELETE /reviewdates/:id"
+      ]
+    },
+
+    "Connections": {
+      "description": "Relationships between constituents",
+      "tableName": "connections",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "parentID": { "type": "integer", "nullable": false, "foreignKey": "Constituents.id" },
+        "childID": { "type": "integer", "nullable": false, "foreignKey": "Constituents.id" },
+        "connectionTypeID": { "type": "integer", "nullable": false, "foreignKey": "ConnectionTypes.id" },
+        "created_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "POST /connections",
+        "DELETE /connections/:id"
+      ]
+    },
+
+    "Letters": {
+      "description": "Physical letter correspondence",
+      "tableName": "letters",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
+        "signed": { "type": "boolean", "default": false },
+        "content": { "type": "longtext", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /letters/:id",
+        "POST /letters",
+        "PATCH /letters/:id"
+      ]
+    },
+
+    "Files": {
+      "description": "Case file attachments",
+      "tableName": "files",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseID": { "type": "integer", "nullable": false, "foreignKey": "Cases.id" },
+        "fileContents": { "type": "longtext", "nullable": true, "description": "Base64 encoded" },
+        "fileName": { "type": "varchar(255)", "nullable": false },
+        "reference": { "type": "varchar(500)", "nullable": true },
+        "timestamp": { "type": "datetime", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /files/:id",
+        "POST /files",
+        "DELETE /files/:id"
+      ]
+    },
+
+    "EmailTemplates": {
+      "tableName": "email_templates",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "subject": { "type": "varchar(500)", "nullable": true },
+        "body": { "type": "longtext", "nullable": true },
+        "active": { "type": "boolean", "default": true }
+      },
+      "apiEndpoints": [
+        "GET /emailtemplates",
+        "GET /emailtemplates/:id",
+        "POST /emailtemplates",
+        "PATCH /emailtemplates/:id",
+        "DELETE /emailtemplates/:id"
+      ]
+    },
+
+    "LetterTemplates": {
+      "tableName": "letter_templates",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "content": { "type": "longtext", "nullable": true },
+        "active": { "type": "boolean", "default": true }
+      }
+    },
+
+    "CaseTemplates": {
+      "tableName": "case_templates",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "template": { "type": "json", "nullable": true },
+        "active": { "type": "boolean", "default": true }
+      },
+      "apiEndpoints": [
+        "GET /casetemplates",
+        "GET /casetemplates/:id",
+        "POST /casetemplates",
+        "PATCH /casetemplates/:id",
+        "DELETE /casetemplates/:id"
+      ]
+    },
+
+    "Letterheads": {
+      "tableName": "letterheads",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "content": { "type": "longtext", "nullable": true }
+      },
+      "apiEndpoints": [
+        "GET /letterheads",
+        "GET /letterheads/:id",
+        "POST /letterheads",
+        "PATCH /letterheads/:id",
+        "DELETE /letterheads/:id"
+      ]
+    },
+
+    "KMLs": {
+      "description": "Geographic boundary definitions",
+      "tableName": "kmls",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "data": { "type": "longtext", "nullable": true }
+      },
+      "apiEndpoints": [
+        "GET /kmls",
+        "POST /kmls",
+        "DELETE /kmls/:id"
+      ]
+    },
+
+    "Groups": {
+      "tableName": "groups",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false }
+      },
+      "apiEndpoints": [
+        "GET /groups",
+        "POST /groups",
+        "PATCH /groups/:id",
+        "DELETE /groups/:id"
+      ]
+    },
+
+    "EmailSignatures": {
+      "tableName": "email_signatures",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "caseworkerID": { "type": "integer", "nullable": false, "foreignKey": "Caseworkers.id" },
+        "signature": { "type": "text", "nullable": true }
+      },
+      "apiEndpoints": [
+        "GET /emailsignatures",
+        "POST /emailsignatures",
+        "PATCH /emailsignatures/:id",
+        "DELETE /emailsignatures/:id"
+      ]
+    },
+
+    "Surveys": {
+      "tableName": "surveys",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "configuration": { "type": "json", "nullable": true },
+        "active": { "type": "boolean", "default": true }
+      }
+    },
+
+    "DoorknockingSurveys": {
+      "tableName": "doorknocking_surveys",
+      "primaryKey": "id",
+      "columns": {
+        "id": { "type": "integer", "nullable": false, "autoIncrement": true },
+        "name": { "type": "varchar(255)", "nullable": false },
+        "configuration": { "type": "json", "nullable": true },
+        "active": { "type": "boolean", "default": true }
+      }
+    }
+  },
+
+  "bulkActionEndpoints": [
+    {
+      "endpoint": "POST /cases/bulkactions/attachfile",
+      "description": "Attach file to multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "fileContents": "string (base64)",
+        "fileName": "string",
+        "reference": "string",
+        "timestamp": "string"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/addnote",
+      "description": "Add note to multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "note": "string"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/changestatus",
+      "description": "Change status of multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "statusID": "number"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/addtags",
+      "description": "Add tags to multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "tags": "number[]"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/sendemail",
+      "description": "Send bulk email based on case search",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "subject": "string",
+        "from": "string",
+        "body": "string",
+        "schedule": "string (timestamp, optional)"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/setreviewdate",
+      "description": "Set review date on multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "reviewDate": "string (MM/DD/YYYY UTC)"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/clearreviewdate",
+      "description": "Clear review date on multiple cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/details",
+      "description": "Bulk change case details",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "contactType": "number (optional)",
+        "assignedToID": "number (optional)",
+        "caseTypeID": "number (optional)",
+        "categoryTypeID": "number (optional)",
+        "statusID": "number (optional)"
+      }
+    },
+    {
+      "endpoint": "POST /cases/bulkactions/delete",
+      "description": "Bulk delete cases",
+      "payload": {
+        "caseSearch": "CaseSearchFilters",
+        "deleteOrphan": "boolean"
+      }
+    }
+  ],
+
+  "caseSearchFilters": {
+    "description": "Common search/filter structure used across case APIs",
+    "fields": {
+      "statusID": { "type": "number[]", "description": "Array of status IDs" },
+      "casetypeID": { "type": "number[]", "description": "Array of casetype IDs" },
+      "categorytypeID": { "type": "number[]", "description": "Array of category IDs" },
+      "contacttypeID": { "type": "number[]", "description": "Array of contact type IDs (stored as enquirytypeID)" },
+      "assignedToID": { "type": "number[]", "description": "Array of caseworker IDs" },
+      "dateRange": {
+        "type": "object",
+        "properties": {
+          "type": "string",
+          "from": "string",
+          "to": "string"
+        }
+      },
+      "tagged": {
+        "type": "object",
+        "properties": {
+          "searchType": "string",
+          "tagID": "number[]"
+        }
+      },
+      "notTagged": {
+        "type": "object",
+        "properties": {
+          "searchType": "string",
+          "tagID": "number[]"
+        }
+      },
+      "orderBy": { "type": "string", "description": "Column to order by (default: created date)" },
+      "orderByDirection": { "type": "string", "enum": ["ASC", "DESC"], "default": "DESC" },
+      "pageNo": { "type": "number", "description": "Page number for pagination" },
+      "resultsPerPage": { "type": "number", "description": "Results per page (required, cannot be 0)" }
+    }
+  },
+
+  "featureFlags": [
+    "permissionSystem",
+    "Survey Tools",
+    "Email Statistics",
+    "Unsubscribe Link",
+    "Electoral Roll Table",
+    "membership list",
+    "unassigned inbox",
+    "Segments",
+    "Physical Address",
+    "Social Media",
+    "AusPostBarcodes",
+    "Recent Appearances",
+    "unlayerEditor",
+    "Phone Statistics",
+    "Canvass Users",
+    "emailAddressSearch",
+    "surgeryBookings",
+    "letterheads",
+    "References",
+    "legacyDoorKnocking",
+    "Doorknocking",
+    "Inbox suggest Changed Email",
+    "Scheduled Emails",
+    "Personal Flags",
+    "Merge registered Only",
+    "membershipSecondaryBranch",
+    "editConstituency",
+    "RelatesTo",
+    "behalfOf",
+    "globalStatistics",
+    "attachmentsWithBulkEmails",
+    "intercom"
+  ]
+}
