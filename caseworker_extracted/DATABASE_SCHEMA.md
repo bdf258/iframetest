@@ -161,6 +161,7 @@ Scheduled case review dates.
 | reviewDate | DATETIME | Review date |
 | note | TEXT | Note to appear on the review date |
 | assignedTo | INT (FK) | User ID the review is assigned to |
+| completed | BOOLEAN | Whether the review date has been marked as complete |
 
 ### Connections
 Relationships between constituents.
@@ -253,6 +254,7 @@ Staff members who handle cases.
 |--------|------|-------------|
 | id | INT (PK) | Primary key |
 | name | VARCHAR | Display name |
+| email | VARCHAR | Email address |
 
 ### EmailSignatures
 Email signatures for caseworkers.

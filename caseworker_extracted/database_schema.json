@@ -374,6 +374,7 @@
         "reviewDate": { "type": "datetime", "nullable": false },
         "note": { "type": "text", "nullable": true, "description": "The note to appear on the review date" },
         "assignedTo": { "type": "integer", "nullable": true, "foreignKey": "Caseworkers.id", "description": "The user ID the review is assigned to" },
+        "completed": { "type": "boolean", "default": false, "description": "Whether the review date has been marked as complete" },
         "created_at": { "type": "timestamp", "nullable": false },
         "updated_at": { "type": "timestamp", "nullable": false }
       },
@@ -427,7 +428,10 @@
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "name": { "type": "varchar(255)", "nullable": false },
         "created_at": { "type": "timestamp", "nullable": false }
-      }
+      },
+      "apiEndpoints": [
+        "GET /donotcontacttypes"
+      ]
     },
 
     "ConnectionTypes": {
@@ -582,7 +586,9 @@
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "name": { "type": "varchar(255)", "nullable": false },
-        "data": { "type": "longtext", "nullable": true }
+        "data": { "type": "longtext", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /kmls",
@@ -596,7 +602,8 @@
       "primaryKey": "id",
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
-        "name": { "type": "varchar(255)", "nullable": false }
+        "name": { "type": "varchar(255)", "nullable": false },
+        "created_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /groups",
@@ -612,7 +619,9 @@
       "columns": {
         "id": { "type": "integer", "nullable": false, "autoIncrement": true },
         "caseworkerID": { "type": "integer", "nullable": false, "foreignKey": "Caseworkers.id" },
-        "signature": { "type": "text", "nullable": true }
+        "signature": { "type": "text", "nullable": true },
+        "created_at": { "type": "timestamp", "nullable": false },
+        "updated_at": { "type": "timestamp", "nullable": false }
       },
       "apiEndpoints": [
         "GET /emailsignatures",

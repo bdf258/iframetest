@@ -223,6 +223,7 @@ CREATE TABLE ReviewDates (
     reviewDate DATETIME NOT NULL,
     note TEXT COMMENT 'Note to appear on the review date',
     assignedTo INT DEFAULT NULL COMMENT 'User ID the review is assigned to',
+    completed BOOLEAN DEFAULT FALSE COMMENT 'Whether the review date has been marked as complete',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (caseID) REFERENCES Cases(id) ON DELETE CASCADE,
